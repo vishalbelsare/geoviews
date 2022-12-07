@@ -7,9 +7,8 @@ from cartopy.crs import GOOGLE_MERCATOR, PlateCarree, Mercator
 from bokeh.models.tools import BoxZoomTool, WheelZoomTool
 from bokeh.models import MercatorTickFormatter, MercatorTicker
 from holoviews.core.dimension import Dimension
-from holoviews.core.util import dimension_sanitizer, basestring
+from holoviews.core.util import dimension_sanitizer
 from holoviews.plotting.bokeh.element import ElementPlot, OverlayPlot as HvOverlayPlot
-from holoviews.plotting.bokeh.util import bokeh_version
 
 from ...element import is_geographic, _Element, Shape
 from ..plot import ProjectionPlot
@@ -21,8 +20,7 @@ class GeoPlot(ProjectionPlot, ElementPlot):
     """
 
     default_tools = param.List(default=['save', 'pan',
-                                        WheelZoomTool(**({} if bokeh_version < '0.12.16' else
-                                                         {'zoom_on_axis': False})),
+                                        WheelZoomTool(zoom_on_axis=False),
                                         BoxZoomTool(match_aspect=True), 'reset'],
         doc="A list of plugin tools to use on the plot.")
 
@@ -128,7 +126,7 @@ class GeoPlot(ProjectionPlot, ElementPlot):
         except:
             CustomJSHover = None
         if (not self.geographic or None in (hover, CustomJSHover) or
-            isinstance(hover.tooltips, basestring) or self.projection is not GOOGLE_MERCATOR
+            isinstance(hover.tooltips, str) or self.projection is not GOOGLE_MERCATOR
             or hover.tooltips is None or 'hv_created' not in hover.tags):
             return
         element = self.current_frame

@@ -96,12 +96,17 @@ except:
 _required = [
     'bokeh >=2.4.0,<2.5',
     'cartopy >=0.18.0',
-    'holoviews >=1.14.2'
+    'holoviews >=1.14.2',
+    'packaging',
+    'numpy',
+    'shapely',
+    'param',
+    'panel',
 ]
 
 _recommended = [
-    'datashader',
-    'geopandas-base',
+    # geopandas-base installed with conda, see setup.cfg
+    'geopandas',
     'netcdf4',
     'jupyter',
     'matplotlib >2.2',
@@ -109,8 +114,12 @@ _recommended = [
     'pyct',
     'scipy',
     'shapely',
-    'xarray'
+    'xarray',
 ]
+
+# Packages not working on python 3.11 becauase of numba
+if sys.version_info < (3, 11):
+    _recommended.append('datashader')
 
 # can only currently run all examples with packages from conda-forge
 _examples_extra = _recommended + [
@@ -124,12 +133,14 @@ extras_require={
     'recommended': _recommended,
     'examples_extra': _examples_extra,
     'doc': _examples_extra + [
-        'nbsite >=0.7.1',
+        'nbsite >=0.7.2rc10',
         'cartopy >=0.20.0',
         'graphviz',
         'lxml',
         'selenium',
-        'pooch'
+        'pooch',
+        'pydata-sphinx-theme <0.9.0',
+        'sphinx-copybutton',
     ],
     'tests': [
         'pytest-cov',
@@ -181,10 +192,11 @@ setup_args = dict(
     classifiers = [
         "License :: OSI Approved :: BSD License",
         "Development Status :: 5 - Production/Stable",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Operating System :: OS Independent",
         "Intended Audience :: Science/Research",
         "Intended Audience :: Developers",

@@ -1,6 +1,5 @@
 from __future__ import division
 
-from distutils.version import LooseVersion
 import sys
 import warnings
 
@@ -12,7 +11,7 @@ import shapely.geometry as sgeom
 from cartopy import crs as ccrs
 from cartopy.io.img_tiles import GoogleTiles, QuadtreeTiles
 from holoviews.element import Tiles
-from holoviews.core.util import basestring
+from packaging.version import Version
 from shapely.geometry.base import BaseMultipartGeometry
 from shapely.geometry import (
     MultiLineString, LineString, MultiPolygon, Polygon, LinearRing,
@@ -25,7 +24,7 @@ line_types = (MultiLineString, LineString)
 poly_types = (MultiPolygon, Polygon, LinearRing)
 
 
-shapely_version = LooseVersion(shapely.__version__)
+shapely_version = Version(shapely.__version__)
 
 
 def wrap_lons(lons, base, period):
@@ -339,7 +338,7 @@ def geom_to_arr(geom):
     # shapely 1.8.0 deprecated `array_interface` and 
     # unfortunately also introduced a bug in the `array_interface_base`
     # property which raised an error as soon as it was called.
-    if shapely_version < '1.8.0':
+    if shapely_version < Version('1.8.0'):
         if hasattr(geom, 'array_interface'):
             data = geom.array_interface()
             return np.array(data['data']).reshape(data['shape'])[:, :2]
@@ -362,7 +361,7 @@ def geom_length(geom):
     if hasattr(geom, 'exterior'):
         geom = geom.exterior
     # As of shapely 1.8.0: LineString, LinearRing (and GeometryCollection?)
-    if shapely_version < '1.8.0':
+    if shapely_version < Version('1.8.0'):
         if not geom.geom_type.startswith('Multi') and hasattr(geom, 'array_interface_base'):
             return len(geom.array_interface_base['data'])//2
     else:
@@ -461,7 +460,7 @@ def check_crs(crs):
     import pyproj
     if isinstance(crs, pyproj.Proj):
         out = crs
-    elif isinstance(crs, dict) or isinstance(crs, basestring):
+    elif isinstance(crs, dict) or isinstance(crs, str):
         try:
             out = pyproj.Proj(crs)
         except RuntimeError:
@@ -591,14 +590,14 @@ def process_crs(crs):
     if crs is None:
         return ccrs.PlateCarree()
 
-    if isinstance(crs, basestring) and crs.lower().startswith('epsg'):
+    if isinstance(crs, str) and crs.lower().startswith('epsg'):
         try:
             crs = ccrs.epsg(crs[5:].lstrip().rstrip())
         except:
             raise ValueError("Could not parse EPSG code as CRS, must be of the format 'EPSG: {code}.'")
     elif isinstance(crs, int):
         crs = ccrs.epsg(crs)
-    elif isinstance(crs, basestring) or is_pyproj(crs):
+    elif isinstance(crs, str) or is_pyproj(crs):
         try:
             crs = proj_to_cartopy(crs)
         except:
